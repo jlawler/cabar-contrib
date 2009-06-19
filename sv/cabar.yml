@@ -1,0 +1,12 @@
+cabar:
+  version: '1.0'
+  component:
+    name: sv
+    version: v0.1
+    description: "tools for manipulating sv services"
+  plugin: 'cabar.rb'
+  requires:
+    component:
+      ruby: true
+      cabar: true
+
