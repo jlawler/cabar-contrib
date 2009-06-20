@@ -1,3 +1,5 @@
+plugin=File.join(File.dirname(__FILE__),'plugin/runsv.rb')
+require plugin 
 module Cabar
   class Facet
     unless defined?(SvService)
@@ -21,8 +23,12 @@ module Cabar
     end # class
 
     class SvService < self
-      attr_accessor :script, :autostart, :log, :finish, :service_name
+      attr_accessor :script, :autostart, :log, :finish, :service_name, :nolink
       COMPONENT_ASSOCATIONS = [ 'provides'.freeze].freeze unless defined?(COMPONENT_ASSOCATIONS)
+      def runsv_dir
+      end 
+      def service_dir
+      end
       def name
         'sv_service'
       end
@@ -78,6 +84,7 @@ DOC
       
       services=get_sv_services
       puts services.values.map{|a|a[1].service_name}.join("\n")
+      puts services.values.map{|a|a[0].base_directory}.join("\n")
       #puts services.values.map{|v|v.inspect.gsub(/^[\s-]$/,'')}.join("\n")
 
     end
