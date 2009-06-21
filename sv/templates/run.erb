@@ -1,0 +1,3 @@
+#!/bin/bash
+eval `cbr env`
+exec <%=cabar.cbr || 'cbr'%> sv __start__ <%=cabar.service_name%>

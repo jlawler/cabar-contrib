@@ -23,11 +23,13 @@ module Cabar
     end # class
 
     class SvService < self
-      attr_accessor :script, :autostart, :log, :finish, :service_name, :nolink
+      attr_accessor :script, :autostart, :log, :finish, :service_name, :nolink, :dir
       COMPONENT_ASSOCATIONS = [ 'provides'.freeze].freeze unless defined?(COMPONENT_ASSOCATIONS)
       def runsv_dir
+        @runsv_dir || "/var/service" 
       end 
       def service_dir
+        [@dir, (self.component.base_directory and File.join(self.component.base_directory,'svc'))].find {|f| f and File.exists?(f)}
       end
       def name
         'sv_service'
@@ -81,8 +83,9 @@ DOC
     cmd [:list], "" do 
       selection.select_dependencies = true
       selection.select_required = true
-      
+#      STDERR.puts Runsv.list_services.inspect 
       services=get_sv_services
+#      STDERR.puts Dir.open("/var/service").entries.reject{|e|e=~/^\./}.inspect
       puts services.values.map{|a|a[1].service_name}.join("\n")
       puts services.values.map{|a|a[0].base_directory}.join("\n")
       #puts services.values.map{|v|v.inspect.gsub(/^[\s-]$/,'')}.join("\n")
