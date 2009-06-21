@@ -3,10 +3,10 @@ require plugin
 module Cabar
   class Facet
     unless defined?(SvService)
-    SvReservedNames=[:runsv, :autostart, :log, :finish, :nolink, :user, :group, :fix_permissions,:finish_timeout].freeze
+    SvReservedNames=[:runsv_dir, :autostart, :log, :finish, :nolink, :user, :group, :fix_permissions,:finish_timeout].freeze
+    
     class SvServiceGroup < self
       attr_accessor *SvReservedNames
-      alias :runsv_dir :runsv
       def _reformat_options! opts
         opts = { :vars => opts }
         opts
@@ -55,15 +55,30 @@ module Cabar
         self.finish_timeout=true
         super
       end
-      def runsv_dir
-        @runsv || self.service_group.runsv_dir || "screwed"
+      def runsv
+        @runsv||=Runsv.new(self.service_dir)
+      end
+      def find_and_exec *args
+        runme=args.shift
+        if File.exists? runme
+          exec *args
+        end
+        args[0]=`which #{runme}`
+        if File.exists? args[0]
+          exec *args 
+        end
+        STDERR.puts "couldn't find #{runme}" 
       end 
       def finish! exit_status=nil
-        STDERR.puts "timeout finish-hook"  if self.should_finish?
+        STDERR.puts "finish-hook: finish"  if self.should_finish?
+        return unless self.finish
+        find_and_exec self.finish,exit_status
       end
+
       def should_finish?
         @finish_timeout
       end
+
       def fix_permissions?
         (self.user or self.group) and self.fix_permissions
       end
@@ -72,16 +87,25 @@ module Cabar
         return STDERR.puts "FAKE EXECUTING SCRIPT #{script}" if script
         return STDERR.puts "FAKE EXECUTING SCRIPT #{action}" if action
         return STDERR.puts "FAKE EXECUTING SCRIPT #{bin}" if bin
+        find_and_exec self.run
       end
       def fix_permissions!
         STDERR.puts "fixing permissions on #{self.service_dir} to #{self.user.inspect}:#{self.group.inspect}"
       end
       def tell_service cmd
-        #check for permissions
-        puts "#{cmd}ing #{self.service_name}"
+        unless  self.exists?
+          puts "Service not created or permissions issue"
+          #return
+        end
+        STDERR.puts self.runsv.status.inspect
+        self.runsv.command(cmd)
       end
       def service_dir
-        [@dir, (self.component.base_directory and File.join(self.component.base_directory,'svc'))].find {|f| f and File.exists?(f)}
+        base=[@dir, (self.component.base_directory and File.join(self.component.base_directory,'svc'))].find {|f| f and File.exists?(f)}
+        File.join(base,self.service_name)
+      end
+      def exists?
+        File.exists? self.service_dir
       end
       def name
         'sv_service'
@@ -160,7 +184,7 @@ DOC
         service.finish!
         puts "finishing #{cmd_args.first}"
     end 
-    Runsv::COMMANDS.each do|command|
+    Runsv::Valid.each do|command|
       cmd [command] do 
         service=nil
         return unless service=get_one_service(Regexp.new('^' + cmd_args.first + '$'))

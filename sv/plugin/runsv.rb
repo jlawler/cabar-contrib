@@ -1,7 +1,55 @@
 require 'yaml'
+class Runsv
+  Valid=[:start,:stop,:try,:kill,:up,:down].freeze unless defined?(Valid)
+  Aliases={
+    :start => :up,
+    :stop => :down,
+    :once => :try
+  }.freeze unless defined?(Aliases)
+  TimeSizes={
+    :days => 3600*24,
+    :hours => 3600,
+    :minutes => 60
+  }.freeze unless defined?(TimeSizes)
+  attr_accessor :base_path
+  def initialize base_pathi
+    self.base_path=base_pathi
+  end
+  def command cmd
+    STDERR.puts "COMMANDING #{cmd} TO #{control_path}"
+    letter=(Aliases[cmd]||cmd).to_s.split(//).first
+    return unless File.exists?(control_path)
+    File.open(control_path,'w'){|fh| fh.print letter}
+  end
+  def stat_path
+    "#{self.base_path}/supervise/stat"
+  end
+  def control_path
+    "#{self.base_path}/supervise/control"
+  end
+  def last_changed_ary
+    seconds_old=Time.now-File.mtime(stat_path)
+    ret={}
+    TimeSizes.keys.sort{|a,b|TimeSizes[a] <=> TimeSizes[b]}.each do |window|
+      if seconds_old  > TimeSizes[window]
+        ret[window]=seconds_old.to_i/TimeSizes[window]
+        seconds_old-=(TimeSizes[window]*ret[window])
+      end
+    end
+    ret[:seconds]=seconds_old
+    STDERR.puts ret.inspect
+    ret
+  end
+  def status
+    return nil unless File.exists?(stat_path)
+    temp=File.read(stat_path).gsub(/\n/,'')
+    return temp unless temp=~/(\S+), got (\S)\S+, want (\S+)/
+    return "#{$1} (want #{$3})" 
+  end
+end
+=begin
 module Runsv
   SEC_PER_DAY=3600*24 unless defined? SEC_PER_DAY
-  COMMANDS=[:start, :stop, :kill].freeze unless defined? COMMANDS
   class <<self
   def list_services
     return @first_pass if @first_pass
@@ -116,4 +164,4 @@ module Runsv
   end
   end
 end
-
+=end
