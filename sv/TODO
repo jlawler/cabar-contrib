@@ -1,0 +1,29 @@
+cbr sv __start__ SERVICE_NAME
+should fire any service start hooks and then exec to the action/command
+
+
+cbr sv __finish__ SERVICE_NAME
+should fire any service start hooks and then exec to the action/command
+
+
+cbr sv <COMMAND> SERVICE_NAME_OR_KEYWORD_OR_COMPONENT
+valid keywords: 'all'
+where SERVICE_NAME_OR_GROUP_OR_COMPONENT can refer to service name, component
+COMMAND can be start/stop/kill/hup/
+
+
+cbr sv list [SERVICE_NAME_OR_KEYWORD_OR_COMPONENT]
+will list the status (running, for how long, etc)
+
+
+cbr sv create [SERVICE_NAME_OR_KEYWORD_OR_COMPONENT]
+will generate the service directory
+
+
+cbr sv remove SERVICE_NAME_OR_KEYWORD
+valid keywords: 'unknown'
+will remove any "rogue" services from your runsv
+  after stopping them.
+  adding a file called "cbr.ignore" into a service will
+  make cbr sv ignore it.
+
