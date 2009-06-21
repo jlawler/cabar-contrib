@@ -1,6 +1,7 @@
 require 'yaml'
 module Runsv
   SEC_PER_DAY=3600*24 unless defined? SEC_PER_DAY
+  COMMANDS=[:start, :stop, :kill].freeze unless defined? COMMANDS
   class <<self
   def list_services
     return @first_pass if @first_pass
