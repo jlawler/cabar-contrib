@@ -1,2 +1,3 @@
 #!/bin/sh
 echo "boc v1.0"
+sleep 100

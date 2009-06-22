@@ -59,9 +59,9 @@ module Cabar
         @runsv||=Runsv.new(self.service_dir)
       end
       def find_and_exec *args
-        runme=args.shift
+        runme=args.first
         if File.exists? runme
-          exec *args
+          Kernel.exec *args
         end
         args[0]=`which #{runme}`
         if File.exists? args[0]
@@ -69,10 +69,11 @@ module Cabar
         end
         STDERR.puts "couldn't find #{runme}" 
       end 
-      def finish! exit_status=nil
+      def finish! exit_status='0'
         STDERR.puts "finish-hook: finish"  if self.should_finish?
+        STDERR.puts self.finish.inspect
         return unless self.finish
-        find_and_exec self.finish,exit_status
+        find_and_exec self.finish,self.service_name,exit_status
       end
 
       def should_finish?
@@ -84,10 +85,11 @@ module Cabar
       end
       def execute!
         self.fix_permissions! if fix_permissions?
+        find_and_exec script
+        #FIXME TODO need kurt's yield an environment crap here.
         return STDERR.puts "FAKE EXECUTING SCRIPT #{script}" if script
         return STDERR.puts "FAKE EXECUTING SCRIPT #{action}" if action
         return STDERR.puts "FAKE EXECUTING SCRIPT #{bin}" if bin
-        find_and_exec self.run
       end
       def fix_permissions!
         STDERR.puts "fixing permissions on #{self.service_dir} to #{self.user.inspect}:#{self.group.inspect}"
@@ -102,6 +104,7 @@ module Cabar
       end
       def service_dir
         base=[@dir, (self.component.base_directory and File.join(self.component.base_directory,'svc'))].find {|f| f and File.exists?(f)}
+        raise "unknown service dir" if base.nil?
         File.join(base,self.service_name)
       end
       def exists?

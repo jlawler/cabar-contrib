@@ -7,11 +7,10 @@ cabar:
     sv:
       runsv_dir: /etc/service
       user: jlawler
-      fake_service:
+      boc_service:
         runsv_dir: /home/jlawler/local/services
-        action: fake_action
-        finish: finish_hook
-
+        script: '<%=cabar.current_directory%>/bin/boc'
+        finish: '<%=cabar.current_directory%>/bin/finish'
     action:
       test: 'rake test'
   requires:
