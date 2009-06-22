@@ -200,10 +200,12 @@ DOC
       registered_services=get_sv_services
       registered_services.values.each do |a|
         if a[1].exists?
-          if true #FIXME permissions_check
-            puts [a[1].service_name, "********NO PERMISSIONS********"].join(' ')
-          else
+          if runsv.read? and runsv.write? #FIXME permissions_check
             puts [a[1].service_name, a[1].runsv.status, a[1].runsv.last_changed_ary.inspect].join(' ')  
+          elsif not runsv.write?
+            puts [a[1].service_name, "********READ ONLY********"].join(' ')
+          else
+            puts [a[1].service_name, "********NO PERMISSIONS********"].join(' ')
           end
         else
           if true #INSTALL CHECK

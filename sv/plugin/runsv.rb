@@ -27,6 +27,12 @@ class Runsv
   def permissions?
     File.readable?(stat_path) and File.writable?(control_path)
   end
+  def read?
+    File.readable?(stat_path)
+  end
+  def write?
+    File.writable?(control_path)
+  end
   def stat_path
     "#{self.base_path}/supervise/stat"
   end
