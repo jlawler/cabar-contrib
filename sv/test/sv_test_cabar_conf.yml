@@ -1,0 +1,8 @@
+cabar:
+  version: v1.0
+  configuration:
+    component_search_path: <%=File.expand_path(File.dirname(cabar.current_file_points_to))%>
+    component:
+      require:
+        boc: true
+

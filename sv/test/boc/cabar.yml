@@ -1,0 +1,23 @@
+cabar:
+  version: v1.0
+  component:
+    version: '1.0'
+  provides:
+    bin: true
+    sv:
+      runsv_dir: /etc/service
+      user: jlawler
+      fake_service:
+        runsv_dir: /home/jlawler/local/services
+        action: fake_action
+        finish: finish_hook
+
+    action:
+      test: 'rake test'
+  requires:
+    component:
+      c2: true
+      c3: true
+      boc_config: true
+      boc_locale: true
+

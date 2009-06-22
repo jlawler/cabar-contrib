@@ -1,0 +1,5 @@
+task :default => :test
+task :test do
+ENV['CABAR_CONFIG']='./test/sv_test_cabar_conf.yml'
+puts `cbr sv list`
+end
