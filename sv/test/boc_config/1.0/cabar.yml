@@ -1,0 +1,15 @@
+cabar:
+  version: v1.0
+  component:
+    version: '1.0'
+  plugin: cabar.rb
+  provides:
+    lib/ruby:
+      path: [ lib ]
+    action:
+      test: 'rake test'
+  requires:
+    component:
+      cabar: true
+      ruby: true
+

@@ -1,4 +1,4 @@
-cbr sv __start__ SERVICE_NAME
+cbr sv __run__ SERVICE_NAME
 should fire any service start hooks and then exec to the action/command
 
 

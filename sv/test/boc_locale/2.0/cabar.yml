@@ -1,0 +1,13 @@
+cabar:
+  version: v1.0
+  component: true
+  plugin: cabar.rb
+  provides:
+    lib/ruby:
+      path: [ lib ]
+    boc_config_path: true
+  requires:
+    component:
+      boc_config: true
+      ruby: true
+

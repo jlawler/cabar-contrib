@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+require 'net/smtp'
+
+
+@mail_server = 'mailserver'
+@mail_port   = 25
+@mail_domain = 'my_hostname'
+@mail_from   = 'script@my_hostname'
+@mail_to     = ['test@test']
+MESSAGE_STRINGS={-1 => 'blah', 0 => 'blah', 'else' => 'blah'}
+
+@footer = "
+Your humble servant,
+  Thomas Watson
+
+
+-----------------------
+http://en.wikipedia.org/wiki/Thomas_A._Watson
+-----------------------
+"
+
+
+
+
+
+
+
+@exit_code, @exit_status =ARGV
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def rfc2822 time
+  time.strftime('%a, %d %b %Y %H:%M:%S ') +
+    if time.utc?
+      '-0000'
+    else
+      off = time.utc_offset
+    sign = off < 0 ? '-' : '+'
+    format('%s%02d%02d', sign, *(off.abs / 60).divmod(60))
+  end
+end
+
+def send_mail(body, subject="Automated Message from #{@mail_domain}",footer=@footer)
+  msg = "From: Thomas A Watson <#{@mail_from}>\r\n" +
+    "To:  <#{@mail_to}>\r\n" +
+    "Subject: #{subject}\r\n" +
+    "Date: #{(rfc2822 Time.now)}\r\n" +
+    "Message-Id: <#{(Time.now)}@#{@mail_domain}>\r\n" +
+    "\r\n#{body}\r\n"
+  msg=msg + footer
+    Net::SMTP.start(@mail_server, @mail_port, @mail_domain) do |smtp|
+      smtp.send_message msg, @mail_from, @mail_to
+    end
+end
+
+case @exit_code.to_i
+  when -1: @msg = MESSAGE_STRINGS[-1]
+  when 0: @msg = MESSAGE_STRINGS[-1]
+  else @msg = MESSAGE_STRINGS['else']
+end
+@msg << "#{rfc2822 Time.now}\n"
+@msg << "It was automatically restarted, of course.\n"
+send_mail(@msg)

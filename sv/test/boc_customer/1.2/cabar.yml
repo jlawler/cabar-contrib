@@ -1,0 +1,21 @@
+cabar:
+  version: '1.0'
+
+  component:
+    version: '1.2'
+
+  provides:
+    lib/ruby:
+      path: [ lib ]
+
+    boc_config_path:
+      path: [ conf ]
+
+    boc_locale_path: true
+
+  requires:
+    component:
+      boc_locale: '1.1'
+      gems: true
+      ruby: true
+
