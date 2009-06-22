@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+require 'ostruct'
+require 'erb'
+$verbose=ENV['VERBOSE']||false
+
+$dir=ARGV[0]
+
+def erbify_dir(path)
+  $stderr.print "ERBIFYING DIR #{path}\n" if $verbose
+  cabar=OpenStruct.new('current_directory' => path,'cabar_directory' => $dir)
+  Dir.open(path).each {|file| file=File.join(path,file)
+    next if file=~/\/.$/
+    next if file=~/\/..$/
+    next if File.symlink? file
+    erbify_dir(file) if File.directory?(file)
+    next unless file=~/.erb$/
+    erb_in=file
+    erb_out=file.dup
+    erb_out.sub!(/.erb$/,'')
+    cfg=nil
+    File.open(erb_in) do |fh|
+      template = ERB.new fh.read
+      cfg=template.result binding 
+    end
+    $stderr.puts "CREATING #{erb_out}" if $verbose
+    File.open(erb_out, File::WRONLY|File::TRUNC|File::CREAT){|fh|
+      fh.puts cfg
+    }
+  }
+end
+erbify_dir("#{$dir}/apache2")
