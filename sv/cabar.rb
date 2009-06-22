@@ -164,6 +164,17 @@ DOC
   facet :sv_service, :class => Cabar::Facet::SvService 
   cmd_group [:sv] do
     cmd [:create] do
+      
+      next unless service=get_one_service(Regexp.new('^' + cmd_args.first + '$'))
+      puts service.service_name
+      puts service.service_dir
+      FileUtils.mkdir(service.service_dir) unless File.exists? service.service_dir
+      puts `cp -rf  #{File.join(File.dirname(__FILE__),'templates/*')} #{service.service_dir}`
+      puts [File.join(File.dirname(__FILE__),'script/erbify'), service.service_dir, service.service_name, service.service_dir].join(' ')
+      system [File.join(File.dirname(__FILE__),'script/erbify'), service.service_dir, service.service_name, service.service_dir].join(' ')
+      puts "ln -s " + [service.service_dir,service.runsv_dir,service.service_name].inspect
+      File.symlink(service.service_dir,File.join(service.runsv_dir,service.service_name))
+      
       puts "not implemented" 
     end 
     cmd [:remove] do 
@@ -175,17 +186,14 @@ DOC
         service=nil
         
         next unless service=get_one_service(Regexp.new('^' + cmd_args.first + '$'))
-        puts service.runsv_dir
         service.execute!
-        puts "starting #{cmd_args.first}"
     end 
     cmd [:__finish__] do
         selection.select_dependencies = true
         selection.select_required = true
         service=nil
         next unless service=get_one_service(Regexp.new('^' + cmd_args.first + '$'))
-        service.finish!
-        puts "finishing #{cmd_args.first}"
+        service.finish! cmd_args[1]
     end 
     Runsv::Valid.each do|command|
       cmd [command] do 

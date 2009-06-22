@@ -7,7 +7,8 @@ $dir=ARGV[0]
 
 def erbify_dir(path)
   $stderr.print "ERBIFYING DIR #{path}\n" if $verbose
-  cabar=OpenStruct.new('current_directory' => path,'cabar_directory' => $dir)
+  cabar=OpenStruct.new('current_directory' => path,'cabar_directory' => $dir, 'service_name'=>ARGV[1], 'service_directory'=> ARGV[2] )
+  puts path.inspect
   Dir.open(path).each {|file| file=File.join(path,file)
     next if file=~/\/.$/
     next if file=~/\/..$/
@@ -26,6 +27,8 @@ def erbify_dir(path)
     File.open(erb_out, File::WRONLY|File::TRUNC|File::CREAT){|fh|
       fh.puts cfg
     }
+    File.chmod 0755, erb_out
   }
+
 end
-erbify_dir("#{$dir}/apache2")
+erbify_dir("#{$dir}")
