@@ -21,6 +21,12 @@ class Runsv
     return unless File.exists?(control_path)
     File.open(control_path,'w'){|fh| fh.print letter}
   end
+  def exists?
+    File.exists?(stat_path) and File.exists?(control_path)
+  end
+  def permissions?
+    File.readable?(stat_path) and File.writable?(control_path)
+  end
   def stat_path
     "#{self.base_path}/supervise/stat"
   end

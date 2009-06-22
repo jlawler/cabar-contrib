@@ -108,7 +108,7 @@ module Cabar
         File.join(base,self.service_name)
       end
       def exists?
-        File.exists? self.service_dir
+        File.exists?(self.service_dir) and runsv.exists?
       end
       def name
         'sv_service'
@@ -198,9 +198,21 @@ DOC
       selection.select_dependencies = true
       selection.select_required = true
       registered_services=get_sv_services
-      puts registered_services.values.map{|a|a[1].service_name}.join("\n")
-      #puts services.values.map{|a|a[0].base_directory}.join("\n")
-      #puts services.values.map{|v|v.inspect.gsub(/^[\s-]$/,'')}.join("\n")
+      registered_services.values.each do |a|
+        if a[1].exists?
+          if true #FIXME permissions_check
+            puts [a[1].service_name, "********NO PERMISSIONS********"].join(' ')
+          else
+            puts [a[1].service_name, a[1].runsv.status, a[1].runsv.last_changed_ary.inspect].join(' ')  
+          end
+        else
+          if true #INSTALL CHECK
+            puts [a[1].service_name, "********NOT CREATED********"].join(' ')
+          else
+            puts [a[1].service_name, "********NOT INSTALLED********"].join(' ')
+          end
+        end
+      end
     end
   end
 end

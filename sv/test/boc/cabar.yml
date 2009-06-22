@@ -8,7 +8,7 @@ cabar:
       runsv_dir: /etc/service
       user: jlawler
       boc_service:
-        runsv_dir: /home/jlawler/local/services
+        runsv_dir: <%=cabar.current_directory%>../runsv
         script: '<%=cabar.current_directory%>/bin/boc'
         finish: '<%=cabar.current_directory%>/bin/finish'
     action:

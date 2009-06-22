@@ -1,4 +1,7 @@
 task :default => :test
+task :test_runsv => :setup_runsv do
+  sleep 100000
+end
 task :setup_runsv do 
   $runsvdir_pid=fork{exec "runsvdir", "./test/runsv" }
   Kernel.at_exit {`kill -9 #{$runsvdir_pid}`}
