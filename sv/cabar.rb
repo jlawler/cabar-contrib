@@ -4,7 +4,6 @@ module Cabar
   class Facet
     unless defined?(SvService)
     SvReservedNames=[:runsv_dir, :autostart, :log, :finish, :nolink, :user, :group, :fix_permissions,:finish_timeout].freeze
-    
     class SvServiceGroup < self
       attr_accessor *SvReservedNames
       def _reformat_options! opts
@@ -24,11 +23,8 @@ module Cabar
         self
       end
 
-      # Creates individual EnvVar facets for each
-      # key/value pair in the option Hash.
       def attach_component! c
         config_self
-        
         vars.each do | n, v |
           next unless Hash===v
           c.create_facet(:sv_service, v.merge({:service_name => n, :service_group => self}))
