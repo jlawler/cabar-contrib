@@ -70,8 +70,7 @@ module Cabar
         STDERR.puts "couldn't find #{runme}" 
       end 
       def finish! exit_status='0'
-#        STDERR.puts "finish-hook: finish"  if self.should_finish?
-        STDERR.puts self.finish.inspect
+        exit_status||='0'
         return unless self.finish
         find_and_exec self.finish,self.service_name,exit_status
       end
@@ -186,6 +185,7 @@ DOC
         selection.select_required = true
         service=nil
         next unless service=get_one_service(Regexp.new('^' + cmd_args.first + '$'))
+        FinishHook.call(service) 
         service.finish! cmd_args[1]
     end 
     Runsv::Valid.each do|command|

@@ -8,7 +8,11 @@ class FinishHook
     @@hooks.values.each{|a|yield(a)}
   end
   def self.add_hook(name, &blk)
-    @@hooks[name.to_sym]=blk
+    new_hook=self.new
+    new_hook.name=name
+    new_hook.blk=blk
+    @@hooks[name.to_sym]=new_hook
+
   end
   def [] hook_name
     @@hooks[hook_name.to_sym]
@@ -18,8 +22,7 @@ class StartHook
   attr_accessor :blk, :name, :auto
   @@hooks={}
   def self.call(facet)
-     self.each{|h|
-h.blk.call(facet)}
+     self.each{|h|h.blk.call(facet)}
   end
   def self.each 
     @@hooks.values.each{|a|yield(a)}
