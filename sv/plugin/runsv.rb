@@ -16,15 +16,12 @@ class Runsv
     self.base_path=base_pathi
   end
   def command cmd
+    return unless File.exists?(control_path) and self.write?
     letter=(Aliases[cmd]||cmd).to_s.split(//).first
-    return unless File.exists?(control_path)
     File.open(control_path,'w'){|fh| fh.print letter}
   end
   def exists?
     File.exists?(stat_path) and File.exists?(control_path)
-  end
-  def permissions?
-    File.readable?(stat_path) and File.writable?(control_path)
   end
   def read?
     File.readable?(stat_path)
@@ -52,11 +49,11 @@ class Runsv
   end
   def last_changed_string
     hsh=last_changed_hsh
-    ret =[]
-    ret << "%02id"%hsh[:days] if hsh[:days]  
-    ret << "%02ih"%hsh[:hours] if hsh[:hours]  
-    ret << "%02im"%hsh[:minutes] if hsh[:minutes]  
-    ret << "%02is"%hsh[:seconds] if hsh[:seconds] 
+    ret = []
+    ret << "%02id"%hsh[:days] if hsh[:days] or ret.size > 0 
+    ret << "%02ih"%hsh[:hours] if hsh[:hours] or ret.size > 0
+    ret << "%02im"%hsh[:minutes] if hsh[:minutes] or ret.size > 0
+    ret << "%02is"%hsh[:seconds] if hsh[:seconds] or ret.size > 0
     ret.join(':') 
   end
   def status
