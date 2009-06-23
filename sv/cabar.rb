@@ -65,7 +65,7 @@ module Cabar
         end
         args[0]=`which #{runme}`
         if File.exists? args[0]
-          exec *args 
+          Kernel.exec *args 
         end
         STDERR.puts "couldn't find #{runme}" 
       end 
@@ -165,11 +165,11 @@ DOC
       #puts [File.join(File.dirname(__FILE__),'script/erbify'), service.service_dir, service.service_name, service.service_dir].join(' ')
       system [File.join(File.dirname(__FILE__),'script/erbify'), service.service_dir, service.service_name, service.service_dir].join(' ')
       #puts "ln -s " + [service.service_dir,service.runsv_dir,service.service_name].inspect
-      File.symlink(service.service_dir,File.join(service.runsv_dir,service.service_name))
-      
-      puts "not implemented" 
+      File.unlink(File.join(service.runsv_dir,service.service_name)) rescue nil
+      File.symlink(File.expand_path(service.service_dir),File.join(service.runsv_dir,service.service_name)) rescue nil
     end 
     cmd [:remove] do 
+      File.unlink(File.join(service.runsv_dir,service.service_name)) if File.exists?(File.join(service.runsv_dir,service.service_name))
       puts "not implemented" 
     end 
     cmd [:__run__] do
