@@ -202,7 +202,7 @@ DOC
       registered_services.values.each do |a|
         if a[1].exists? and a[1].runsv.exists?
           if a[1].runsv.read? and a[1].runsv.write? #FIXME permissions_check
-            printf("%20s %20s %20s\n" , a[1].service_name, a[1].runsv.status, a[1].runsv.last_changed_ary.inspect)
+            printf("%20s %20s %20s\n" , a[1].service_name, a[1].runsv.status, a[1].runsv.last_changed_string)
           elsif not a[1].runsv.write?
             puts [a[1].service_name, "********READ ONLY********"].join(' ')
           else
