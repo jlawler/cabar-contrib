@@ -6,10 +6,15 @@ task :setup_runsv do
   $runsvdir_pid=fork{exec "runsvdir", "./test/runsv" }
   Kernel.at_exit {`kill -9 #{$runsvdir_pid}`}
 end
-task :test => :setup_runsv do
+task :test => [:setup_runsv, :test_run]
+
+task :test_run do 
   ENV['CABAR_CONFIG']='./test/sv_test_cabar_conf.yml'
-  puts `cbr sv list`
   puts `cbr sv __run__ boc_service`
+end
+task :test_finish do 
+  ENV['CABAR_CONFIG']='./test/sv_test_cabar_conf.yml'
+  puts `cbr sv __finish__ boc_service`
 end
 
 
