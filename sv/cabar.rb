@@ -70,7 +70,7 @@ module Cabar
         STDERR.puts "couldn't find #{runme}" 
       end 
       def finish! exit_status='0'
-        STDERR.puts "finish-hook: finish"  if self.should_finish?
+#        STDERR.puts "finish-hook: finish"  if self.should_finish?
         STDERR.puts self.finish.inspect
         return unless self.finish
         find_and_exec self.finish,self.service_name,exit_status
@@ -91,11 +91,10 @@ module Cabar
         return STDERR.puts "FAKE EXECUTING SCRIPT #{bin}" if bin
       end
       def tell_service cmd
-        unless  self.exists?
+        unless  self.exists? and self.runsv.exists? and self.runsv.write?
           puts "Service not created or permissions issue"
-          #return
+          return
         end
-        STDERR.puts self.runsv.status.inspect
         self.runsv.command(cmd)
       end
       def service_dir
@@ -104,7 +103,7 @@ module Cabar
         File.join(base,self.service_name)
       end
       def exists?
-        File.exists?(self.service_dir) and runsv.exists?
+        File.exists?(self.service_dir)
       end
       def name
         'sv_service'
@@ -162,13 +161,11 @@ DOC
     cmd [:create] do
       
       next unless service=get_one_service(Regexp.new('^' + cmd_args.first + '$'))
-      puts service.service_name
-      puts service.service_dir
       FileUtils.mkdir(service.service_dir) unless File.exists? service.service_dir
-      puts `cp -rf  #{File.join(File.dirname(__FILE__),'templates/*')} #{service.service_dir}`
-      puts [File.join(File.dirname(__FILE__),'script/erbify'), service.service_dir, service.service_name, service.service_dir].join(' ')
+      `cp -rf  #{File.join(File.dirname(__FILE__),'templates/*')} #{service.service_dir}`
+      #puts [File.join(File.dirname(__FILE__),'script/erbify'), service.service_dir, service.service_name, service.service_dir].join(' ')
       system [File.join(File.dirname(__FILE__),'script/erbify'), service.service_dir, service.service_name, service.service_dir].join(' ')
-      puts "ln -s " + [service.service_dir,service.runsv_dir,service.service_name].inspect
+      #puts "ln -s " + [service.service_dir,service.runsv_dir,service.service_name].inspect
       File.symlink(service.service_dir,File.join(service.runsv_dir,service.service_name))
       
       puts "not implemented" 
@@ -203,16 +200,16 @@ DOC
       selection.select_required = true
       registered_services=get_sv_services
       registered_services.values.each do |a|
-        if a[1].exists?
-          if runsv.read? and runsv.write? #FIXME permissions_check
-            puts [a[1].service_name, a[1].runsv.status, a[1].runsv.last_changed_ary.inspect].join(' ')  
-          elsif not runsv.write?
+        if a[1].exists? and a[1].runsv.exists?
+          if a[1].runsv.read? and a[1].runsv.write? #FIXME permissions_check
+            printf("%20s %20s %20s\n" , a[1].service_name, a[1].runsv.status, a[1].runsv.last_changed_ary.inspect)
+          elsif not a[1].runsv.write?
             puts [a[1].service_name, "********READ ONLY********"].join(' ')
           else
             puts [a[1].service_name, "********NO PERMISSIONS********"].join(' ')
           end
         else
-          if true #INSTALL CHECK
+          if not a[1].exists?
             puts [a[1].service_name, "********NOT CREATED********"].join(' ')
           else
             puts [a[1].service_name, "********NOT INSTALLED********"].join(' ')

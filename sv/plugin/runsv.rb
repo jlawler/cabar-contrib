@@ -16,7 +16,6 @@ class Runsv
     self.base_path=base_pathi
   end
   def command cmd
-    STDERR.puts "COMMANDING #{cmd} TO #{control_path}"
     letter=(Aliases[cmd]||cmd).to_s.split(//).first
     return unless File.exists?(control_path)
     File.open(control_path,'w'){|fh| fh.print letter}
@@ -49,7 +48,6 @@ class Runsv
       end
     end
     ret[:seconds]=seconds_old
-    STDERR.puts ret.inspect
     ret
   end
   def status

@@ -1,7 +1,7 @@
 me=StartHook.add_hook(:fix_permissions){|facet|
   STDERR.puts "FIX PERMISSIONS HOOK!"
   dir=facet.service_dir
-  File.chmod(0550, File.join(dir,'supervise'))
+  File.chmod(0750, File.join(dir,'supervise'))
   File.chmod(0770, File.join(dir,'supervise/control'))
   File.chmod(0550, File.join(dir,'supervise/stat'))
   ['supervise','supervise/control','supervise/stat'].each do|f|f=File.join(dir,f)

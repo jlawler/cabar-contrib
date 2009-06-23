@@ -35,6 +35,5 @@ h.blk.call(facet)}
   end
 end
 Dir.glob("#{File.dirname(__FILE__)}/hooks/*.rb"){|h|
-  STDERR.puts h.inspect
   require h
 }
