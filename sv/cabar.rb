@@ -1,5 +1,5 @@
-plugin=File.join(File.dirname(__FILE__),'plugin/runsv.rb')
-require plugin 
+require File.join(File.dirname(__FILE__),'plugin/runsv.rb')
+require File.join(File.dirname(__FILE__),'hook.rb')
 module Cabar
   class Facet
     unless defined?(SvService)
@@ -84,15 +84,11 @@ module Cabar
         (self.user or self.group) and self.fix_permissions
       end
       def execute!
-        self.fix_permissions! if fix_permissions?
         find_and_exec script
         #FIXME TODO need kurt's yield an environment crap here.
         return STDERR.puts "FAKE EXECUTING SCRIPT #{script}" if script
         return STDERR.puts "FAKE EXECUTING SCRIPT #{action}" if action
         return STDERR.puts "FAKE EXECUTING SCRIPT #{bin}" if bin
-      end
-      def fix_permissions!
-        STDERR.puts "fixing permissions on #{self.service_dir} to #{self.user.inspect}:#{self.group.inspect}"
       end
       def tell_service cmd
         unless  self.exists?
@@ -184,8 +180,8 @@ DOC
         selection.select_dependencies = true
         selection.select_required = true
         service=nil
-        
         next unless service=get_one_service(Regexp.new('^' + cmd_args.first + '$'))
+        StartHook.call(service) 
         service.execute!
     end 
     cmd [:__finish__] do
