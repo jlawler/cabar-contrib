@@ -39,19 +39,16 @@ Cabar::Plugin.new :documentation => cabar_doc do
       selection.select_required = true
       rails_app=get_components_by_facets('rails'){|c|Regexp.new(cmd_args.first)===c.name}
       rails_app_c, rails_app_f=*(rails_app.first)
-      rails_servers=selection.to_a.map{|c|c.facets.inject(nil){|ret,f| ret ||( f.name=='rails_server' ? [c,f] : nil )}}.compact
-      unless rails_servers.size > 0
-        puts "No rails_server found!" 
-        next
-      end
+      rails_servers=get_components_by_facets('rails_server')
+      next puts "No rails_server found!" unless rails_servers.size > 0
+
       #FIXME TODO:  Do better than defaulting to first rails_server
       rails_server_c, rails_server_f=*(rails_servers.first)
       args=Cabar::Facet::RailsHead::RAILS_FIELDS.map{|i| "#{i}=#{rails_app_f.send(i)}" if rails_app_f.send(i) }.compact.join(',')
+      #FIXME TODO:  Use the env yield crap
       fork {
-      rails_server_c.facets.each do |f|  
-        if f.key=='action'
-          f.execute_action! rails_server_f.create_rails_action, [cmd_args.first.dup,args, apache_template].compact, {}
-        end
+      rails_server_c.facets.actions.each do |f|  
+        f.execute_action! rails_server_f.create_rails_action, [cmd_args.first.dup,args, apache_template].compact, {}
       end
       }
       Process.wait
@@ -59,10 +56,8 @@ Cabar::Plugin.new :documentation => cabar_doc do
       resolver.add_top_level_component! rails_server_c
       resolver.add_top_level_component! rails_app_c
       setup_environment!
-      rails_server_c.facets.each do |f|  
-        if f.key=='action'
-          f.execute_action! rails_server_f.start_rails_action, [cmd_args.first], {}
-        end
+      rails_server_c.facets.actions.each do |f|  
+        f.execute_action! rails_server_f.start_rails_action, [cmd_args.first], {}
       end
     end
 
