@@ -1,0 +1,9 @@
+cabar:
+  version: '1.0'
+
+  plugin: cabar.rb
+  component:
+    version: v0.1
+    description: 'rails fragments'
+
+
