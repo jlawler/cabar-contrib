@@ -81,9 +81,9 @@ module Cabar
       def execute!
         find_and_exec script
         #FIXME TODO need kurt's yield an environment crap here.
-        return STDERR.puts "FAKE EXECUTING SCRIPT #{script}" if script
-        return STDERR.puts "FAKE EXECUTING SCRIPT #{action}" if action
-        return STDERR.puts "FAKE EXECUTING SCRIPT #{bin}" if bin
+        return(STDERR.puts "FAKE EXECUTING SCRIPT #{script}") if script
+        return(STDERR.puts "FAKE EXECUTING SCRIPT #{action}") if action
+        return(STDERR.puts "FAKE EXECUTING SCRIPT #{bin}") if bin
       end
       def tell_service cmd
         unless  self.exists? and self.runsv.exists? and self.runsv.write?
@@ -128,7 +128,8 @@ class Cabar::Command
     def get_one_service match=nil
       services=get_sv_services(match)
       unless services.values.first
-        return puts "unknown service #{cmd_args.first}"
+        puts "unknown service #{cmd_args.first}"
+        return 
       end
       services.values.first.last
     end
