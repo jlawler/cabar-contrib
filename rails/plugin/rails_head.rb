@@ -35,6 +35,27 @@ module Cabar
       def component_associations
         COMPONENT_ASSOCATIONS
       end
+      def valid?
+      end
+      def config_errors
+        errors=[]
+        unless File.exists? rails_root
+          errors << "invalid rails_root #{rails_root}"
+        end 
+        if log_dir and not File.exists?(log_dir)
+          errors << "invalid log directory specified #{rails_root}"
+        end
+        if ssl_cert.nil? ^ ssl_port.nil?
+          if ssl_cert
+            errors << "ssl_cert specified, but no ssl_port defined"
+          else
+            errors << "ssl_port specified, but no ssl_cert defined"
+          end 
+        end
+        if ssl_cert and not File.exists?(ssl_cert)
+            errors << "can't find file #{ssl_cert}"
+        end
+      end
       def is_composable?
         false
       end

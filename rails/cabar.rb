@@ -8,7 +8,22 @@ Defaults to 'create_rails_head' and 'start_rails_head' respectively.
 
 Apps must specify:
   port
+    The HTTP port to start the server on
+They can optionally specify:
+  user and group 
+    used to drop permissions, if run with root
 
+  ssl_port and ssl_cert
+    specify the location of the SSL cert and the port to start
+    a instance of the app under SSL (Defaults to no ssl instance)
+
+  rails_root 
+    defaults to rails directory in this component
+
+  log_dir, error_log_file and access_log_file
+    specifies where the logs get put, and the error and access log
+    file name respectively.  The files default to "access.log" and
+    "error.log."  The directory defaults to the rails/log directory. 
 DOC
 
 cabar_rails_start = <<'DOC' 
@@ -39,6 +54,11 @@ Cabar::Plugin.new :documentation => cabar_doc do
       selection.select_required = true
       rails_app=get_components_by_facets('rails'){|c|Regexp.new(cmd_args.first)===c.name}
       rails_app_c, rails_app_f=*(rails_app.first)
+      unless rails_app_f.valid? 
+        puts rails_app_f.config_errors
+        next
+      end  
+      
       rails_servers=get_components_by_facets('rails_server')
       next puts "No rails_server found!" unless rails_servers.size > 0
 
