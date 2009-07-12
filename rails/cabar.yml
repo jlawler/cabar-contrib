@@ -1,7 +1,7 @@
 cabar:
   version: '1.0'
   component:
-    name: rails
+    name: rails_app
     version: v0.1
     description: "rails running facet"
   plugin: 'cabar.rb'
@@ -9,4 +9,5 @@ cabar:
     component:
       ruby: true
       cabar: true
+      derby: true
 

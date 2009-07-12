@@ -35,7 +35,8 @@ module Cabar
       def component_associations
         COMPONENT_ASSOCATIONS
       end
-      def valid?
+      def valid_config?
+        config_errors.size==0
       end
       def config_errors
         errors=[]
@@ -55,6 +56,7 @@ module Cabar
         if ssl_cert and not File.exists?(ssl_cert)
             errors << "can't find file #{ssl_cert}"
         end
+        errors
       end
       def is_composable?
         false

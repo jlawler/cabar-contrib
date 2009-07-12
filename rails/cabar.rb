@@ -1,5 +1,6 @@
 require File.join(File.dirname(__FILE__),'plugin/rails_server')
 require File.join(File.dirname(__FILE__),'plugin/rails_head')
+
 cabar_doc= <<'DOC' 
 Support for rails apps under mod_rails
 There are 2 sides to the "rails_head" API.  Servers and Apps.
@@ -54,7 +55,7 @@ Cabar::Plugin.new :documentation => cabar_doc do
       selection.select_required = true
       rails_app=get_components_by_facets('rails'){|c|Regexp.new(cmd_args.first)===c.name}
       rails_app_c, rails_app_f=*(rails_app.first)
-      unless rails_app_f.valid? 
+      unless rails_app_f.valid_config? 
         puts rails_app_f.config_errors
         next
       end  
