@@ -1,11 +1,11 @@
 
-unless defined? Cabar::Facer::RailsServer
 module Cabar
   class Facet
     class RailsServer < self
       attr_accessor :create_rails_action
       attr_accessor :start_rails_action
-      COMPONENT_ASSOCATIONS = [ 'provides'.freeze].freeze unless defined?(COMPONENT_ASSOCATIONS)
+      attr_accessor :derby_options
+      COMPONENT_ASSOCATIONS = [ 'provides'.freeze].freeze 
       def name
         'rails_server'
       end
@@ -23,6 +23,5 @@ module Cabar
       end
     end
   end
-end
 end
 
