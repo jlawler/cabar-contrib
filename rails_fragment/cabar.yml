@@ -6,4 +6,6 @@ cabar:
     version: v0.1
     description: 'rails fragments'
 
+  provides:
+    lib/ruby: true
 
