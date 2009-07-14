@@ -1,6 +1,8 @@
 
 # Interface to rails_fragment rails/* Facets.
 module RailsFragment
+  # Fragments=[ :controllers, :models, :views, :helpers, :plugins ]
+  Fragments=[ :controllers, :models ].freeze
   EXTRA_RAILS_MODEL_PATHS=[*(ENV['RAILS_MODELS_PATHS'].split(':'))].compact
   EXTRA_RAILS_CONTROLLER_PATHS=[*(ENV['RAILS_CONTROLLERS_PATHS'].split(':'))].compact
 
@@ -17,7 +19,7 @@ module RailsFragment
     @@path ||=
       begin
         h = { }
-        [ :controllers, :models, :views, :helpers, :plugins ].each do | n |
+        .each do | n |
       	  n_v = n.to_s.upcase
       	  h[n] = (ENV["RAILS_#{n_v}_PATH"] || '').split(':')
       	end
