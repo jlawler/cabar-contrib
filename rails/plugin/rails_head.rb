@@ -7,12 +7,20 @@ module Cabar
       attr_accessor :ssl_port
       attr_accessor :ssl_cert
       attr_accessor :rails_root
-      attr_accessor :apache_template
       attr_accessor :log_dir
       attr_accessor :error_log_file
       attr_accessor :access_log_file
       attr_accessor :tmp
-      RAILS_FIELDS=[:tmp, :access_log_file, :error_log_file, :log_dir, :rails_root, :ssl_cert, :ssl_port, :port, :user, :group] unless defined?(RAILS_FIELDS)
+      attr_accessor :server
+
+      RAILS_FIELDS=[:tmp, :access_log_file, :error_log_file, :log_dir, :rails_root, :ssl_cert, :ssl_port, :port, :user, :group]
+      COMPONENT_ASSOCATIONS = [ 'provides'.freeze].freeze 
+      def options_for_server
+        a=RAILS_FIELDS.inject(_options.dup||{}) do |opts,field|
+          opts.merge({field =>self.send(field)})
+        end
+        a
+      end
       def access_log_file
         File.join(log_dir,@access_log_file || "access.log")
       end
@@ -31,7 +39,6 @@ module Cabar
           x if File.exist? x
         end
       end
-      COMPONENT_ASSOCATIONS = [ 'provides'.freeze].freeze unless defined? COMPONENT_ASSOCATIONS
       def component_associations
         COMPONENT_ASSOCATIONS
       end
