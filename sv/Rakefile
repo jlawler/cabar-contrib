@@ -3,8 +3,10 @@ task :test_runsv => :setup_runsv do
   sleep 100000
 end
 task :setup_runsv do 
-  $runsvdir_pid=fork{exec "runsvdir", "./test/runsv" }
-  Kernel.at_exit {`kill -9 #{$runsvdir_pid}`}
+  $runsvdir_pid=fork{exec "runsv", "./test/runsv/boc_service" }
+  Kernel.at_exit {
+    `kill -9 #{$runsvdir_pid}`
+  }
 end
 task :test => [:setup_runsv, :test_run]
 

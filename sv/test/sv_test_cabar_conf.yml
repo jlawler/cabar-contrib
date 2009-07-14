@@ -5,4 +5,5 @@ cabar:
     component:
       require:
         boc: true
+        sv: true
 

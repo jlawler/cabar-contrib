@@ -12,7 +12,7 @@ me=FinishHook.add_hook(:backoff){|facet|
   history_file=File.join(dir,'.backoff_history')
   now=Time.now.to_i
   last_finish,window=nil,nil
-  if File.exists?(@history_file)
+  if File.exists?(history_file)
     last_finish,window=File.read(history_file).split(/,/).map{|s|s.to_i}
     if now-last_finish  < reset_time
       window=sleep_progression.call(window)
