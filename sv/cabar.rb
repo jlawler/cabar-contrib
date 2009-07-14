@@ -1,3 +1,20 @@
+Cabar::Plugin.new :documentation => <<'DOC' do 
+Support for easy creation and manipulation of sv/runit services under cabar
+Componets can just specify the script to run, or specify options.
+
+Example 1: 
+sv:
+  service_name: action
+
+Example 2:
+sv:
+  service_name: 
+    action: action_name
+    finish: finish_script
+    log: log stuff
+    autostart: true
+DOC
+
 require File.join(File.dirname(__FILE__),'plugin/runsv.rb')
 require File.join(File.dirname(__FILE__),'hook.rb')
 module Cabar
@@ -135,22 +152,6 @@ class Cabar::Command
     end
 end
 
-Cabar::Plugin.new :documentation => <<'DOC' do 
-Support for easy creation and manipulation of sv/runit services under cabar
-Componets can just specify the script to run, or specify options.
-
-Example 1: 
-sv:
-  service_name: action
-
-Example 2:
-sv:
-  service_name: 
-    action: action_name
-    finish: finish_script
-    log: log stuff
-    autostart: true
-DOC
   facet :sv, :class => Cabar::Facet::SvServiceGroup 
   facet :sv_service, :class => Cabar::Facet::SvService 
   cmd_group [:sv] do
