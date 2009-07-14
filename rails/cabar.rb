@@ -1,5 +1,3 @@
-require File.join(File.dirname(__FILE__),'plugin/rails_server')
-require File.join(File.dirname(__FILE__),'plugin/rails_head')
 
 cabar_doc= <<'DOC' 
 Support for rails apps under mod_rails
@@ -33,6 +31,9 @@ cbr rails_apps start dialer_web
 DOC
 
 Cabar::Plugin.new :documentation => cabar_doc do
+  require File.join(File.dirname(__FILE__),'plugin/rails_server')
+  require File.join(File.dirname(__FILE__),'plugin/rails_head')
+
   facet :rails_server, :class => Cabar::Facet::RailsServer 
   facet :rails, :class => Cabar::Facet::RailsHead 
   cmd_group [:rails_apps] do 
@@ -56,8 +57,7 @@ Cabar::Plugin.new :documentation => cabar_doc do
       rails_app=get_components_by_facets('rails'){|c|Regexp.new(cmd_args.first)===c.name}
       rails_app_c, rails_app_f=*(rails_app.first)
       unless rails_app_f.valid_config? 
-        puts rails_app_f.config_errors
-        next
+        next(puts rails_app_f.config_errors)
       end  
       
       rails_servers=get_components_by_facets('rails_server')
@@ -65,13 +65,23 @@ Cabar::Plugin.new :documentation => cabar_doc do
 
       #FIXME TODO:  Do better than defaulting to first rails_server
       rails_server_c, rails_server_f=*(rails_servers.first)
-      args=Cabar::Facet::RailsHead::RAILS_FIELDS.map{|i| "#{i}=#{rails_app_f.send(i)}" if rails_app_f.send(i) }.compact.join(',')
-      #FIXME TODO:  Use the env yield crap
-      fork {
-      rails_server_c.facets.actions.each do |f|  
-        f.execute_action! rails_server_f.create_rails_action, [cmd_args.first.dup,args, apache_template].compact, {}
+
+      server_opts=rails_app_f.options_for_server.dup
+      server_opts.delete(:documentation)
+      if server_opts and server_opts['generate_configs']
+        #MOVE TO TEMP DIR?
+        #rails_app -> temp_dir -> rails_server
+        #fork for create_rail_from_dir action
+      else
+        args=hash_to_dotted(server_opts,cabar).map{|(k,v)|[k,v].join('=')}.join(',')
+        #FIXME TODO:  Use the env yield crap
+
+        fork {
+          rails_server_c.facets.actions.each do |f|  
+            f.execute_action! rails_server_f.create_rails_action, [cmd_args.first.dup,args, apache_template].compact, {}
+          end
+        }
       end
-      }
       Process.wait
       Dir.chdir rails_server_c.directory
       resolver.add_top_level_component! rails_server_c
@@ -83,6 +93,18 @@ Cabar::Plugin.new :documentation => cabar_doc do
     end
 
     class Cabar::Command
+  def hash_to_dotted hsh={}, basename=nil
+    hsh.inject({})do |out,(k,v)|
+      next out if v.nil?
+      key=k
+      key="#{basename}.#{k}" if basename
+      if Hash===v
+         next out.merge(hash_to_dotted(v,key))
+      end
+      out.merge({key => v.to_s})
+    end
+  end
+
       def get_components_by_facets key
         result = [ ]
         selection.to_a.each do | c |
